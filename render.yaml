@@ -1,0 +1,45 @@
+services:
+  - type: cron
+    name: caskroute-product-catalog-agent
+    runtime: node
+    plan: free
+    schedule: "0 8 * * *"
+    buildCommand: npm install
+    startCommand: node product-catalog-agent.js
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  - type: cron
+    name: caskroute-store-location-agent
+    runtime: node
+    plan: free
+    schedule: "0 6 * * 1"
+    buildCommand: npm install
+    startCommand: node store-location-agent.js
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+
+  - type: cron
+    name: caskroute-chain-price-agent
+    runtime: node
+    plan: free
+    schedule: "0 */6 * * *"
+    buildCommand: npm install
+    startCommand: node chain-price-agent.js
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
