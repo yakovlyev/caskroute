@@ -1,8 +1,23 @@
+# CaskRoute — конфигурация Render Cron Jobs
+#
+# Как подключить (один раз, в интерфейсе render.com):
+#   1. New → Blueprint → выбрать репозиторий yakovlyev/caskroute
+#   2. Render сам прочитает этот файл и предложит создать 3 Cron Job сервиса
+#   3. Для каждого сервиса — во вкладке Environment вписать один раз:
+#        SUPABASE_URL
+#        SUPABASE_SERVICE_ROLE_KEY
+#        ANTHROPIC_API_KEY
+#   4. Готово — дальше агенты запускаются сами по расписанию, без ручных действий.
+#
+# Расписание (schedule) — в формате cron, время UTC:
+#   product-catalog-agent — раз в день в 08:00 UTC (наполнение каталога + фото)
+#   store-location-agent  — раз в неделю по понедельникам в 06:00 UTC (новые магазины редко открываются)
+#   chain-price-agent     — каждые 6 часов (цены сетевых магазинов меняются чаще)
+
 services:
   - type: cron
     name: caskroute-product-catalog-agent
     runtime: node
-    plan: free
     schedule: "0 8 * * *"
     buildCommand: npm install
     startCommand: node product-catalog-agent.js
@@ -17,7 +32,6 @@ services:
   - type: cron
     name: caskroute-store-location-agent
     runtime: node
-    plan: free
     schedule: "0 6 * * 1"
     buildCommand: npm install
     startCommand: node store-location-agent.js
@@ -32,7 +46,6 @@ services:
   - type: cron
     name: caskroute-chain-price-agent
     runtime: node
-    plan: free
     schedule: "0 */6 * * *"
     buildCommand: npm install
     startCommand: node chain-price-agent.js
