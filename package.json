@@ -1,0 +1,15 @@
+{
+  "name": "caskroute-agents",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CaskRoute automation agents — product catalog, store locations, chain prices. Deployed on Render as scheduled Cron Jobs.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "product-catalog": "node product-catalog-agent.js",
+    "store-location": "node store-location-agent.js",
+    "chain-price": "node chain-price-agent.js"
+  }
+}
