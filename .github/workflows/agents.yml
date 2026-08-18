@@ -1,0 +1,73 @@
+# CaskRoute — автозапуск агентов через GitHub Actions
+#
+# Полностью бесплатно для публичных репозиториев, без лимитов, без риска
+# внезапного списания — в отличие от Render, тут нет привязки карты вообще.
+#
+# Как подключить (один раз):
+#   1. В репозитории yakovlyev/caskroute открыть Settings → Secrets and
+#      variables → Actions → New repository secret
+#   2. Добавить четыре секрета (имя точно как здесь, значение — сам ключ):
+#        SUPABASE_URL
+#        SUPABASE_SERVICE_ROLE_KEY
+#        ANTHROPIC_API_KEY
+#        GOOGLE_PLACES_API_KEY   (можно пропустить, если ключа ещё нет —
+#                                  тогда просто не добавлять этот секрет,
+#                                  store-location агент будет молча падать
+#                                  с понятной ошибкой в логах, остальные
+#                                  два работают независимо от него)
+#   3. Всё — дальше работает само, без дальнейших действий.
+
+name: CaskRoute Agents
+
+on:
+  schedule:
+    - cron: '0 8 * * *'      # product-catalog-agent — раз в день в 08:00 UTC
+    - cron: '0 6 * * 1'      # store-location-agent  — по понедельникам в 06:00 UTC
+    - cron: '0 */6 * * *'    # chain-price-agent      — каждые 6 часов
+  workflow_dispatch:         # + можно запускать вручную кнопкой на GitHub
+
+jobs:
+  product-catalog:
+    if: github.event.schedule == '0 8 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: node product-catalog-agent.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  store-location:
+    if: github.event.schedule == '0 6 * * 1' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: node store-location-agent.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+
+  chain-price:
+    if: github.event.schedule == '0 */6 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: node chain-price-agent.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
