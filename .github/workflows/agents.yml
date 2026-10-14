@@ -20,10 +20,10 @@
 name: CaskRoute Agents
 
 on:
-  schedule:
-    - cron: '0 8 * * *'      # product-catalog-agent — раз в день в 08:00 UTC
-    - cron: '0 6 * * 1'      # store-location-agent  — по понедельникам в 06:00 UTC
-    - cron: '0 */6 * * *'    # chain-price-agent      — каждые 6 часов
+  # schedule: PAUSED by owner 14.10.2026 - agents move to Hermes. To resume, restore:
+  #   - cron: '0 8 * * *'      # product-catalog-agent
+  #   - cron: '0 6 * * 1'      # store-location-agent
+  #   - cron: '0 */6 * * *'    # chain-price-agent
   workflow_dispatch:         # + можно запускать вручную кнопкой на GitHub
 
 jobs:
